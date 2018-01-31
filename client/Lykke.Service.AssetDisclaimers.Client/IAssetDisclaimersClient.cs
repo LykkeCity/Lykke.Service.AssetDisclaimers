@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Lykke.Service.AssetDisclaimers.Client.Models.ClientDisclaimers;
 using Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers;
 using Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities;
 
@@ -26,12 +27,16 @@ namespace Lykke.Service.AssetDisclaimers.Client
         Task UpdateDisclaimerAsync(EditDisclaimerModel model);
         
         Task DeleteDisclaimerAsync(string lykkeEntityId, string disclaimerId);
+
+        Task<IReadOnlyList<DisclaimerModel>> GetApprovedClientDisclaimersAsync(string clientId);
         
         Task<IReadOnlyList<DisclaimerModel>> GetPendingClientDisclaimersAsync(string clientId);
         
-        Task<IReadOnlyList<DisclaimerModel>> GetNotApprovedClientDisclaimersAsync(string clientId, string lykkeEntityId1, string lykkeEntityId2);
+        Task<CheckResultModel> CheckTradableClientDisclaimerAsync(string clientId, string lykkeEntityId1, string lykkeEntityId2);
         
-        Task AddPendingClientDisclaimerAsync(string clientId, string disclaimerId);
+        Task<CheckResultModel> CheckDepositClientDisclaimerAsync(string clientId, string lykkeEntityId);
+        
+        Task<CheckResultModel> CheckWithdrawalClientDisclaimerAsync(string clientId, string lykkeEntityId);
         
         Task ApproveClientDisclaimerAsync(string clientId, string disclaimerId);
         

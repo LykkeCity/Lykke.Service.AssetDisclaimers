@@ -6,12 +6,16 @@ namespace Lykke.Service.AssetDisclaimers.Core.Services
 {
     public interface IClientDisclaimerService
     {
+        Task<IReadOnlyList<IDisclaimer>> GetApprovedAsync(string clientId);
+        
         Task<IReadOnlyList<IDisclaimer>> GetPendingAsync(string clientId);
         
-        Task<IReadOnlyList<IDisclaimer>> GetNotApprovedAsync(string clientId, IReadOnlyList<string> lykkeEntities);
+        Task<bool> CheckTradableAsync(string clientId, string lykkeEntityId1, string lykkeEntityId2);
         
-        Task AddPendingAsync(string clientId, string disclaimerId);
-
+        Task<bool> CheckDepositAsync(string clientId, string lykkeEntityId);
+        
+        Task<bool> CheckWithdrawalAsync(string clientId, string lykkeEntityId);
+        
         Task ApproveAsync(string clientId, string disclaimerId);
 
         Task DeclineAsync(string clientId, string disclaimerId);

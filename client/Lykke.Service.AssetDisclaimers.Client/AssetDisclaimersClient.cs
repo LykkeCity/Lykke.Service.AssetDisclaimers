@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Lykke.Service.AssetDisclaimers.Client.Api;
+using Lykke.Service.AssetDisclaimers.Client.Models.ClientDisclaimers;
 using Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers;
 using Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -95,21 +96,31 @@ namespace Lykke.Service.AssetDisclaimers.Client
             await _runner.RunAsync(() => _disclaimersApi.DeleteAsync(lykkeEntityId, disclaimerId));
         }
 
+        public async Task<IReadOnlyList<DisclaimerModel>> GetApprovedClientDisclaimersAsync(string clientId)
+        {
+            return await _runner.RunAsync(() => _clientDisclaimersApi.GetApprovedAsync(clientId));
+        }
+        
         public async Task<IReadOnlyList<DisclaimerModel>> GetPendingClientDisclaimersAsync(string clientId)
         {
             return await _runner.RunAsync(() => _clientDisclaimersApi.GetPendingAsync(clientId));
         }
 
-        public async Task<IReadOnlyList<DisclaimerModel>> GetNotApprovedClientDisclaimersAsync(string clientId, string lykkeEntityId1, string lykkeEntityId2)
+        public async Task<CheckResultModel> CheckTradableClientDisclaimerAsync(string clientId, string lykkeEntityId1, string lykkeEntityId2)
         {
-            return await _runner.RunAsync(() => _clientDisclaimersApi.GetNotApprovedAsync(clientId, lykkeEntityId1, lykkeEntityId2));
+            return await _runner.RunAsync(() => _clientDisclaimersApi.CheckTradableAsync(clientId, lykkeEntityId1, lykkeEntityId2));
         }
 
-        public async Task AddPendingClientDisclaimerAsync(string clientId, string disclaimerId)
+        public async Task<CheckResultModel> CheckDepositClientDisclaimerAsync(string clientId, string lykkeEntityId)
         {
-            await _runner.RunAsync(() => _clientDisclaimersApi.AddPendingAsync(clientId, disclaimerId));
+            return await _runner.RunAsync(() => _clientDisclaimersApi.CheckDepositAsync(clientId, lykkeEntityId));
         }
-
+        
+        public async Task<CheckResultModel> CheckWithdrawalClientDisclaimerAsync(string clientId, string lykkeEntityId)
+        {
+            return await _runner.RunAsync(() => _clientDisclaimersApi.CheckWithdrawalAsync(clientId, lykkeEntityId));
+        }
+        
         public async Task ApproveClientDisclaimerAsync(string clientId, string disclaimerId)
         {
             await _runner.RunAsync(() => _clientDisclaimersApi.ApproveAsync(clientId, disclaimerId));

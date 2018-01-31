@@ -1,5 +1,3 @@
-using System;
-
 namespace Lykke.Service.AssetDisclaimers.Client 
 {
     public class AssetDisclaimersServiceClientSettings 

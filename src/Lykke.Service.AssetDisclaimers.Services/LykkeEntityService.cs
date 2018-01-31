@@ -38,6 +38,11 @@ namespace Lykke.Service.AssetDisclaimers.Services
 
         public async Task<ILykkeEntity> AddAsync(ILykkeEntity lykkeEntity)
         {
+            ILykkeEntity existingLykkeEntity = await _lykkeEntityRepository.GetAsync(lykkeEntity.Id);
+
+            if (existingLykkeEntity != null)
+                throw new LykkeEntityAlreadyExistsException(lykkeEntity.Id);
+            
             ILykkeEntity createdLykkeEntity = await _lykkeEntityRepository.InsertAsync(lykkeEntity);
             
             await _log.WriteInfoAsync(nameof(LykkeEntityService), nameof(UpdateAsync),

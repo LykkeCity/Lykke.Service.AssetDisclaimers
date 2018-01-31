@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using AzureStorage;
@@ -31,21 +30,21 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
             return Mapper.Map<LykkeEntity>(entity);
         }
 
-        public async Task<ILykkeEntity> InsertAsync(ILykkeEntity disclaimer)
+        public async Task<ILykkeEntity> InsertAsync(ILykkeEntity lykkeEntity)
         {
-            var entity = new LykkeEntityEntity(GetPartitionKey(), GetRowKey());
-            Mapper.Map(disclaimer, entity);
+            var entity = new LykkeEntityEntity(GetPartitionKey(), GetRowKey(lykkeEntity.Id));
+            Mapper.Map(lykkeEntity, entity);
 
             await _storage.InsertAsync(entity);
 
             return Mapper.Map<LykkeEntity>(entity);
         }
 
-        public async Task UpdateAsync(ILykkeEntity disclaimer)
+        public async Task UpdateAsync(ILykkeEntity lykkeEntity)
         {
-            await _storage.MergeAsync(GetPartitionKey(), GetRowKey(disclaimer.Id), entity =>
+            await _storage.MergeAsync(GetPartitionKey(), GetRowKey(lykkeEntity.Id), entity =>
             {
-                Mapper.Map(disclaimer, entity);
+                Mapper.Map(lykkeEntity, entity);
                 return entity;
             });
         }
@@ -59,9 +58,6 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
             => "LykkeEntity";
 
         private static string GetRowKey(string lykkeEntityId)
-            => lykkeEntityId;
-
-        private static string GetRowKey()
-            => Guid.NewGuid().ToString("D");
+            => lykkeEntityId.ToUpper().Trim();
     }
 }

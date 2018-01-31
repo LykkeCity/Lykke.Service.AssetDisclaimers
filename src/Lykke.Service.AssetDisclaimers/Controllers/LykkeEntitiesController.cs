@@ -89,11 +89,20 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new ErrorResponse().AddErrors(ModelState));
 
-            var lykkeEntity = Mapper.Map<LykkeEntity>(model);
+            try
+            {
+                var lykkeEntity = Mapper.Map<LykkeEntity>(model);
 
-            ILykkeEntity createdLykkeEntity = await _lykkeEntityService.AddAsync(lykkeEntity);
-
-            return Ok(Mapper.Map<LykkeEntityModel>(createdLykkeEntity));
+                ILykkeEntity createdLykkeEntity = await _lykkeEntityService.AddAsync(lykkeEntity);
+                
+                return Ok(Mapper.Map<LykkeEntityModel>(createdLykkeEntity));
+            }
+            catch (LykkeEntityAlreadyExistsException exception)
+            {
+                await _log.WriteErrorAsync(nameof(LykkeEntitiesController), nameof(AddAsync),
+                    model.ToJson(), exception);
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
         }
 
         /// <summary>

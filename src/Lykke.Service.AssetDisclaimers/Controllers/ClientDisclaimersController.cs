@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -9,6 +8,7 @@ using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.AssetDisclaimers.Core.Domain;
 using Lykke.Service.AssetDisclaimers.Core.Exceptions;
 using Lykke.Service.AssetDisclaimers.Core.Services;
+using Lykke.Service.AssetDisclaimers.Models.ClientDisclaimers;
 using Lykke.Service.AssetDisclaimers.Models.Disclaimers;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -30,7 +30,26 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
         }
         
         /// <summary>
-        /// Returns a collection of disclaimers pending to approve.
+        /// Returns client approved disclaimers.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <returns>A collection of disclaimers.</returns>
+        /// <response code="200">A collection of disclaimers.</response>
+        [HttpGet]
+        [Route("clients/{clientId}/disclaimers/approved")]
+        [SwaggerOperation("ClientDisclaimersGetApproved")]
+        [ProducesResponseType(typeof(List<DisclaimerModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetApprovedAsync(string clientId)
+        {
+            IReadOnlyList<IDisclaimer> disclaimers = await _clientDisclaimerService.GetApprovedAsync(clientId);
+
+            var model = Mapper.Map<List<DisclaimerModel>>(disclaimers);
+
+            return Ok(model);
+        }
+        
+        /// <summary>
+        /// Returns client disclaimers requires approval.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <returns>A collection of disclaimers.</returns>
@@ -49,36 +68,31 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
         }
         
         /// <summary>
-        /// Returns a collection of disclaimers for specified entities not appreved by client.
+        /// Finds an actual for today tradable disclaimer by higher priority Lykke entity and requires client approval if it has not yet been approved.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <param name="lykkeEntityId1">The Lykke entity id.</param>
         /// <param name="lykkeEntityId2">The Lykke entity id.</param>
-        /// <returns>A collection of disclaimers.</returns>
-        /// <response code="200">A collection of disclaimers.</response>
+        /// <returns>A check result.</returns>
+        /// <response code="200">A check result.</response>
         /// <response code="404">The Lykke entity not found.</response>
-        [HttpGet]
-        [Route("clients/{clientId}/disclaimers")]
-        [SwaggerOperation("ClientDisclaimersGetNotApproved")]
-        [ProducesResponseType(typeof(List<DisclaimerModel>), (int)HttpStatusCode.OK)]
+        [HttpPost]
+        [Route("clients/{clientId}/disclaimers/tradable")]
+        [SwaggerOperation("ClientDisclaimersCheckTradable")]
+        [ProducesResponseType(typeof(CheckResultModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> GetNotApprovedAsync(string clientId, string lykkeEntityId1, string lykkeEntityId2)
+        public async Task<IActionResult> CheckTradableAsync(string clientId, string lykkeEntityId1, string lykkeEntityId2)
         {
-            IReadOnlyList<IDisclaimer> disclaimers;
-            
             try
             {
-                disclaimers = await _clientDisclaimerService.GetNotApprovedAsync(clientId,
-                    new List<string>
-                        {
-                            lykkeEntityId1,
-                            lykkeEntityId2
-                        }.Where(o => !string.IsNullOrEmpty(o))
-                        .ToList());
+                bool requiresApproval =
+                    await _clientDisclaimerService.CheckTradableAsync(clientId, lykkeEntityId1, lykkeEntityId2);
+
+                return Ok(new CheckResultModel {RequiresApproval = requiresApproval});
             }
             catch (LykkeEntityNotFoundException exception)
             {
-                await _log.WriteErrorAsync(nameof(ClientDisclaimersController), nameof(GetNotApprovedAsync),
+                await _log.WriteErrorAsync(nameof(ClientDisclaimersController), nameof(CheckTradableAsync),
                     new
                     {
                         clientId,
@@ -87,45 +101,76 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
                     }.ToJson(), exception);
                 return NotFound(ErrorResponse.Create(exception.Message));
             }
-            
-            var model = Mapper.Map<List<DisclaimerModel>>(disclaimers);
-
-            return Ok(model);
         }
-
+        
         /// <summary>
-        /// Adds a disclimer to client. This disclaimer awaits the client's approval. 
+        /// Finds an actual for today deposit disclaimer by Lykke entity and requires client approval if it has not yet been approved.
         /// </summary>
         /// <param name="clientId">The client id.</param>
-        /// <param name="disclaimerId">The disclaimer id.</param>
-        /// <returns>No content.</returns>
-        /// <response code="204">A disclaimer added to client.</response>
-        /// <response code="404">The disclaimer not found.</response>
+        /// <param name="lykkeEntityId">The Lykke entity id.</param>
+        /// <returns>A check result.</returns>
+        /// <response code="200">A check result.</response>
+        /// <response code="404">The Lykke entity not found.</response>
         [HttpPost]
-        [Route("clients/{clientId}/disclaimers/{disclaimerId}")]
-        [SwaggerOperation("ClientDisclaimersAdd")]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [Route("clients/{clientId}/disclaimers/deposit")]
+        [SwaggerOperation("ClientDisclaimersCheckDeposit")]
+        [ProducesResponseType(typeof(CheckResultModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> AddPendingAsync(string clientId, string disclaimerId)
+        public async Task<IActionResult> CheckDepositAsync(string clientId, string lykkeEntityId)
         {
             try
             {
-                await _clientDisclaimerService.AddPendingAsync(clientId, disclaimerId);
+                bool requiresApproval =
+                    await _clientDisclaimerService.CheckDepositAsync(clientId, lykkeEntityId);
+
+                return Ok(new CheckResultModel {RequiresApproval = requiresApproval});
             }
-            catch (DisclaimerNotFoundException exception)
+            catch (LykkeEntityNotFoundException exception)
             {
-                await _log.WriteErrorAsync(nameof(ClientDisclaimersController), nameof(AddPendingAsync),
+                await _log.WriteErrorAsync(nameof(ClientDisclaimersController), nameof(CheckDepositAsync),
                     new
                     {
                         clientId,
-                        disclaimerId
+                        lykkeEntityId
                     }.ToJson(), exception);
                 return NotFound(ErrorResponse.Create(exception.Message));
             }
-
-            return NoContent();
         }
         
+        /// <summary>
+        /// Finds an actual for today withdrawal disclaimer by Lykke entity and requires client approval if it has not yet been approved.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="lykkeEntityId">The Lykke entity id.</param>
+        /// <returns>A check result.</returns>
+        /// <response code="200">A check result.</response>
+        /// <response code="404">The Lykke entity not found.</response>
+        [HttpPost]
+        [Route("clients/{clientId}/disclaimers/withdrawal")]
+        [SwaggerOperation("ClientDisclaimersCheckWithdrawal")]
+        [ProducesResponseType(typeof(CheckResultModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> CheckWithdrawalAsync(string clientId, string lykkeEntityId)
+        {
+            try
+            {
+                bool requiresApproval =
+                    await _clientDisclaimerService.CheckWithdrawalAsync(clientId, lykkeEntityId);
+
+                return Ok(new CheckResultModel {RequiresApproval = requiresApproval});
+            }
+            catch (LykkeEntityNotFoundException exception)
+            {
+                await _log.WriteErrorAsync(nameof(ClientDisclaimersController), nameof(CheckWithdrawalAsync),
+                    new
+                    {
+                        clientId,
+                        lykkeEntityId
+                    }.ToJson(), exception);
+                return NotFound(ErrorResponse.Create(exception.Message));
+            }
+        }
+
         /// <summary>
         /// Sets client disclimer as approved. 
         /// </summary>
