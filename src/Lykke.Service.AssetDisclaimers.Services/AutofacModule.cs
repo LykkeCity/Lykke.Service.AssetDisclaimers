@@ -16,6 +16,15 @@ namespace Lykke.Service.AssetDisclaimers.Services
 
             builder.RegisterType<ShutdownManager>()
                 .As<IShutdownManager>();
+            
+            builder.RegisterType<DisclaimerService>()
+                .As<IDisclaimerService>();
+            
+            builder.RegisterType<LykkeEntityService>()
+                .As<ILykkeEntityService>();
+            
+            builder.RegisterType<ClientDisclaimerService>()
+                .As<IClientDisclaimerService>();
         }
     }
 }

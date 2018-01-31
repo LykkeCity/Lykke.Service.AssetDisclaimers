@@ -6,7 +6,7 @@ Client: [Nuget](https://www.nuget.org/packages/Lykke.Service.AssetDisclaimers.Cl
 
 # Client usage
 
-Register client services in container using extension method:
+Register client services in container:
 
 ```cs
 ContainerBuilder builder;
