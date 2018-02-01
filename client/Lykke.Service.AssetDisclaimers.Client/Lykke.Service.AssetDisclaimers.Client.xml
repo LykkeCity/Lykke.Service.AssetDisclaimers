@@ -75,7 +75,7 @@
         </member>
         <member name="T:Lykke.Service.AssetDisclaimers.Client.ErrorResponseException">
             <summary>
-            Represents error response from the Blockchain API service
+            Represents error response from the Asset Disclaimers API service
             </summary>
         </member>
     </members>

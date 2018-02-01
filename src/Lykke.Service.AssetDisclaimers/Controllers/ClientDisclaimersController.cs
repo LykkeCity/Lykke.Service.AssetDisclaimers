@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -19,13 +20,16 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
     public class ClientDisclaimersController : Controller
     {
         private readonly IClientDisclaimerService _clientDisclaimerService;
+        private readonly IDisclaimerService _disclaimerService;
         private readonly ILog _log;
 
         public ClientDisclaimersController(
             IClientDisclaimerService clientDisclaimerService,
+            IDisclaimerService disclaimerService,
             ILog log)
         {
             _clientDisclaimerService = clientDisclaimerService;
+            _disclaimerService = disclaimerService;
             _log = log;
         }
         
@@ -38,12 +42,26 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
         [HttpGet]
         [Route("clients/{clientId}/disclaimers/approved")]
         [SwaggerOperation("ClientDisclaimersGetApproved")]
-        [ProducesResponseType(typeof(List<DisclaimerModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(List<ClientDisclaimerModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetApprovedAsync(string clientId)
         {
-            IReadOnlyList<IDisclaimer> disclaimers = await _clientDisclaimerService.GetApprovedAsync(clientId);
+            IReadOnlyList<IClientDisclaimer> clienApprovedDisclaimers =
+                await _clientDisclaimerService.GetApprovedAsync(clientId);
 
-            var model = Mapper.Map<List<DisclaimerModel>>(disclaimers);
+            var model = new List<ClientDisclaimerModel>();
+
+            foreach (IClientDisclaimer clientDisclaimer in clienApprovedDisclaimers)
+            {
+                IDisclaimer disclaimer = await _disclaimerService.FindAsync(clientDisclaimer.DisclaimerId);
+
+                if (disclaimer == null)
+                    continue;
+
+                var clientDisclaimerModel = Mapper.Map<ClientDisclaimerModel>(disclaimer);
+                clientDisclaimerModel.ApprovedDate = clientDisclaimer.ApprovedDate ?? DateTime.UtcNow;
+
+                model.Add(clientDisclaimerModel);
+            }
 
             return Ok(model);
         }
@@ -60,7 +78,17 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
         [ProducesResponseType(typeof(List<DisclaimerModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetPendingAsync(string clientId)
         {
-            IReadOnlyList<IDisclaimer> disclaimers = await _clientDisclaimerService.GetPendingAsync(clientId);
+            IReadOnlyList<IClientDisclaimer> clienPendingDisclaimers = await _clientDisclaimerService.GetPendingAsync(clientId);
+
+            var disclaimers = new List<IDisclaimer>();
+
+            foreach (IClientDisclaimer clientDisclaimer in clienPendingDisclaimers)
+            {
+                IDisclaimer disclaimer = await _disclaimerService.FindAsync(clientDisclaimer.DisclaimerId);
+
+                if (disclaimer != null)
+                    disclaimers.Add(disclaimer);
+            }
 
             var model = Mapper.Map<List<DisclaimerModel>>(disclaimers);
 

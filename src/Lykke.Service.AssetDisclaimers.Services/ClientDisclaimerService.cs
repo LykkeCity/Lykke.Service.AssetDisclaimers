@@ -30,42 +30,22 @@ namespace Lykke.Service.AssetDisclaimers.Services
             _log = log;
         }
         
-        public async Task<IReadOnlyList<IDisclaimer>> GetApprovedAsync(string clientId)
+        public async Task<IReadOnlyList<IClientDisclaimer>> GetApprovedAsync(string clientId)
         {
             IReadOnlyList<IClientDisclaimer> clientDisclaimers = await _clientDisclaimerRepository.GetAsync(clientId);
 
-            IList<string> clienApprovedDisclaimers = clientDisclaimers
+            return clientDisclaimers
                 .Where(o => o.Approved)
-                .Select(o => o.DisclaimerId)
                 .ToList();
-
-            var disclaimers = new List<IDisclaimer>();
-            
-            foreach (string disclaimerId in clienApprovedDisclaimers)
-            {
-                disclaimers.Add(await _disclaimerRepository.FindAsync(disclaimerId));
-            }
-            
-            return disclaimers;
         }
         
-        public async Task<IReadOnlyList<IDisclaimer>> GetPendingAsync(string clientId)
+        public async Task<IReadOnlyList<IClientDisclaimer>> GetPendingAsync(string clientId)
         {
             IReadOnlyList<IClientDisclaimer> clientDisclaimers = await _clientDisclaimerRepository.GetAsync(clientId);
 
-            IList<string> clienPendingDisclaimers = clientDisclaimers
+            return clientDisclaimers
                 .Where(o => !o.Approved)
-                .Select(o => o.DisclaimerId)
                 .ToList();
-
-            var disclaimers = new List<IDisclaimer>();
-            
-            foreach (string disclaimerId in clienPendingDisclaimers)
-            {
-                disclaimers.Add(await _disclaimerRepository.FindAsync(disclaimerId));
-            }
-            
-            return disclaimers;
         }
 
         public async Task<bool> CheckTradableAsync(string clientId, string lykkeEntityId1, string lykkeEntityId2)

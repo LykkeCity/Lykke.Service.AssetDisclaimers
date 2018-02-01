@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Lykke.Service.AssetDisclaimers.Client.Models.ClientDisclaimers;
 using Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers;
@@ -28,7 +28,7 @@ namespace Lykke.Service.AssetDisclaimers.Client
         
         Task DeleteDisclaimerAsync(string lykkeEntityId, string disclaimerId);
 
-        Task<IReadOnlyList<DisclaimerModel>> GetApprovedClientDisclaimersAsync(string clientId);
+        Task<IReadOnlyList<ClientDisclaimerModel>> GetApprovedClientDisclaimersAsync(string clientId);
         
         Task<IReadOnlyList<DisclaimerModel>> GetPendingClientDisclaimersAsync(string clientId);
         

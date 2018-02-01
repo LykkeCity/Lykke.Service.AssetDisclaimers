@@ -6,9 +6,9 @@ namespace Lykke.Service.AssetDisclaimers.Core.Services
 {
     public interface IClientDisclaimerService
     {
-        Task<IReadOnlyList<IDisclaimer>> GetApprovedAsync(string clientId);
+        Task<IReadOnlyList<IClientDisclaimer>> GetApprovedAsync(string clientId);
         
-        Task<IReadOnlyList<IDisclaimer>> GetPendingAsync(string clientId);
+        Task<IReadOnlyList<IClientDisclaimer>> GetPendingAsync(string clientId);
         
         Task<bool> CheckTradableAsync(string clientId, string lykkeEntityId1, string lykkeEntityId2);
         

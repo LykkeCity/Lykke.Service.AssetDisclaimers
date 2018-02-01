@@ -8,6 +8,7 @@ namespace Lykke.Service.AssetDisclaimers.Core.Services
     {
         Task<IReadOnlyList<IDisclaimer>> GetAsync(string lykkeEntityId);
         Task<IDisclaimer> GetAsync(string lykkeEntityId, string disclaimerId);
+        Task<IDisclaimer> FindAsync(string disclaimerId);
         Task<IDisclaimer> AddAsync(IDisclaimer disclaimer);
         Task UpdateAsync(IDisclaimer disclaimer);
         Task DeleteAsync(string lykkeEntityId, string disclaimerId);

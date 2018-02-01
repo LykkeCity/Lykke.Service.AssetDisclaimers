@@ -9,7 +9,7 @@ namespace Lykke.Service.AssetDisclaimers.Client.Api
     internal interface IClientDisclaimersApi
     {
         [Get("/api/clients/{clientId}/disclaimers/approved")]
-        Task<IReadOnlyList<DisclaimerModel>> GetApprovedAsync(string clientId);
+        Task<IReadOnlyList<ClientDisclaimerModel>> GetApprovedAsync(string clientId);
             
         [Get("/api/clients/{clientId}/disclaimers/pending")]
         Task<IReadOnlyList<DisclaimerModel>> GetPendingAsync(string clientId);

@@ -96,7 +96,7 @@ namespace Lykke.Service.AssetDisclaimers.Client
             await _runner.RunAsync(() => _disclaimersApi.DeleteAsync(lykkeEntityId, disclaimerId));
         }
 
-        public async Task<IReadOnlyList<DisclaimerModel>> GetApprovedClientDisclaimersAsync(string clientId)
+        public async Task<IReadOnlyList<ClientDisclaimerModel>> GetApprovedClientDisclaimersAsync(string clientId)
         {
             return await _runner.RunAsync(() => _clientDisclaimersApi.GetApprovedAsync(clientId));
         }

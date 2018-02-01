@@ -40,6 +40,11 @@ namespace Lykke.Service.AssetDisclaimers.Services
             return await _disclaimerRepository.GetAsync(lykkeEntityId, disclaimerId);
         }
 
+        public async Task<IDisclaimer> FindAsync(string disclaimerId)
+        {
+            return await _disclaimerRepository.FindAsync(disclaimerId);
+        }
+
         public async Task<IDisclaimer> AddAsync(IDisclaimer disclaimer)
         {
             ILykkeEntity lykkeEntity = await _lykkeEntityRepository.GetAsync(disclaimer.LykkeEntityId);
