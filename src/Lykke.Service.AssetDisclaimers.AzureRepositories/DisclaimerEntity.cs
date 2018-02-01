@@ -9,6 +9,7 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
     [ValueTypeMergingStrategy(ValueTypeMergingStrategy.UpdateIfDirty)]
     public class DisclaimerEntity : AzureTableEntity
     {
+        private DisclaimerType _type;
         private DateTime _startDate;
         
         public DisclaimerEntity()
@@ -23,7 +24,15 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
         
         public string LykkeEntityId { get; set; }
         
-        public DisclaimerType Type { get; set; }
+        public DisclaimerType Type
+        {
+            get => _type;
+            set
+            {
+                _type = value;
+                MarkValueTypePropertyAsDirty(nameof(Type));
+            }
+        }
 
         public string Name { get; set; }
         

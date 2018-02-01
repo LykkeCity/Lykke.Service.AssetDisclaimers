@@ -6,7 +6,7 @@ using Refit;
 namespace Lykke.Service.AssetDisclaimers.Client
 {
     /// <summary>
-    /// Represents error response from the Blockchain API service
+    /// Represents error response from the Asset Disclaimers API service
     /// </summary>
     public class ErrorResponseException : Exception
     {

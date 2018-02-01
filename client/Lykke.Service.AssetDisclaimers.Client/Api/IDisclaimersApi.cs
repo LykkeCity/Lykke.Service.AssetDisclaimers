@@ -19,7 +19,7 @@ namespace Lykke.Service.AssetDisclaimers.Client.Api
         [Put("/api/lykkeentities/disclaimers")]
         Task UpdateAsync([Body] EditDisclaimerModel model);
 
-        [Delete("/apilykkeentities/{lykkeEntityId}/disclaimers/{disclaimerId}")]
+        [Delete("/api/lykkeentities/{lykkeEntityId}/disclaimers/{disclaimerId}")]
         Task DeleteAsync(string lykkeEntityId, string disclaimerId);
     }
 }
