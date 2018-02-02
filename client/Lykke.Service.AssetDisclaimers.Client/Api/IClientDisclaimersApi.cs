@@ -14,13 +14,13 @@ namespace Lykke.Service.AssetDisclaimers.Client.Api
         [Get("/api/clients/{clientId}/disclaimers/pending")]
         Task<IReadOnlyList<DisclaimerModel>> GetPendingAsync(string clientId);
         
-        [Get("/api/clients/{clientId}/disclaimers/tradable")]
+        [Post("/api/clients/{clientId}/disclaimers/tradable")]
         Task<CheckResultModel> CheckTradableAsync(string clientId, string lykkeEntityId1, string lykkeEntityId2);
         
-        [Get("/api/clients/{clientId}/disclaimers/deposit")]
+        [Post("/api/clients/{clientId}/disclaimers/deposit")]
         Task<CheckResultModel> CheckDepositAsync(string clientId, string lykkeEntityId);
         
-        [Get("/api/clients/{clientId}/disclaimers/withdrawal")]
+        [Post("/api/clients/{clientId}/disclaimers/withdrawal")]
         Task<CheckResultModel> CheckWithdrawalAsync(string clientId, string lykkeEntityId);
         
         [Post("/api/clients/{clientId}/disclaimers/{disclaimerId}/approve")]
