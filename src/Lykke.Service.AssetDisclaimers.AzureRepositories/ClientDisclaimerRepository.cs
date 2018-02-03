@@ -49,7 +49,7 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
             var index = AzureIndex.Create(GetDisclaimerIdIndexPartitionKey(clientDisclaimer.DisclaimerId),
                 GetDisclaimerIdIndexRowKey(clientDisclaimer.ClientId), entity);
             
-            await _disclaimerIdIndexStorage.InsertAsync(index);
+            await _disclaimerIdIndexStorage.InsertOrReplaceAsync(index);
         }
 
         public async Task DeleteAsync(string clientId, string disclaimerId)
