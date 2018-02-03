@@ -143,8 +143,8 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
         /// <summary>
         /// Deletes a Lykke entity.
         /// </summary>
-        /// <returns>No content.</returns>
         /// <param name="lykkeEntityId">The Lykke entity id.</param>
+        /// <returns>No content.</returns>
         /// <response code="204">Lykke entity successfully deleted.</response>
         /// <response code="400">Can not delete Lykke entity if one or more disclimers exists.</response>
         [HttpDelete]

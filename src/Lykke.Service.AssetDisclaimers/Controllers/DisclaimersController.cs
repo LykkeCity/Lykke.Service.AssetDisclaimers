@@ -11,7 +11,6 @@ using Lykke.Service.AssetDisclaimers.Core.Exceptions;
 using Lykke.Service.AssetDisclaimers.Core.Services;
 using Lykke.Service.AssetDisclaimers.Extensions;
 using Lykke.Service.AssetDisclaimers.Models.Disclaimers;
-using Lykke.Service.AssetDisclaimers.Models.LykkeEntities;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 

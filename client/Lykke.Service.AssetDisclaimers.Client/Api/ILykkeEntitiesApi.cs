@@ -5,7 +5,7 @@ using Refit;
 
 namespace Lykke.Service.AssetDisclaimers.Client.Api
 {
-    public interface ILykkeEntitiesApi
+    internal interface ILykkeEntitiesApi
     {
         [Get("/api/lykkeentities")]
         Task<IReadOnlyList<LykkeEntityModel>> GetAsync();

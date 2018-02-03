@@ -4,9 +4,421 @@
         <name>Lykke.Service.AssetDisclaimers.Client</name>
     </assembly>
     <members>
+        <member name="T:Lykke.Service.AssetDisclaimers.Client.AssetDisclaimersServiceClientSettings">
+            <summary>
+            Settings for <see cref="T:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient"/>.
+            </summary>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.AssetDisclaimersServiceClientSettings.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Lykke.Service.AssetDisclaimers.Client.AssetDisclaimersServiceClientSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.AssetDisclaimersServiceClientSettings.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of <see cref="T:Lykke.Service.AssetDisclaimers.Client.AssetDisclaimersServiceClientSettings"/> with service url.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.AssetDisclaimersServiceClientSettings.ServiceUrl">
+            <summary>
+            The asset disclaimers service url.
+            </summary>
+        </member>
         <member name="T:Lykke.Service.AssetDisclaimers.Client.ErrorResponseException">
             <summary>
             Represents error response from the Asset Disclaimers API service
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.ErrorResponseException.Error">
+            <summary>
+            Gets a response error details.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.ErrorResponseException.StatusCode">
+            <summary>
+            Gets a http response status code.
+            </summary>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.ErrorResponseException.#ctor(Lykke.Common.Api.Contract.Responses.ErrorResponse,Refit.ApiException)">
+            <summary>
+            Initializes a new instance of <see cref="T:Lykke.Service.AssetDisclaimers.Client.ErrorResponseException"/> with response error details and API excepiton.
+            </summary>
+            <param name="error">The response error details</param>
+            <param name="inner">The exception occurred during calling service API.</param>
+        </member>
+        <member name="T:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient">
+            <summary>
+            HTTP client for Asset disclaimers service.
+            </summary>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.GetLykkeEntitiesAsync">
+            <summary>
+            Returns a collection of Lykke entities.
+            </summary>
+            <returns>A collection of Lykke entities.</returns>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.GetLykkeEntityAsync(System.String)">
+            <summary>
+            Returns a Lykke entity.
+            </summary>
+            <param name="lykkeEntityId">The Lykke entity id.</param>
+            <returns>The Lykke entity.</returns>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.AddLykkeEntityAsync(Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.CreateLykkeEntityModel)">
+            <summary>
+            Adds a Lykke entity.
+            </summary>
+            <param name="model">The Lykke entity creation information.</param>
+            <returns>The created Lykke entity.</returns>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.UpdateLykkeEntityAsync(Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.EditLykkeEntityModel)">
+            <summary>
+            Updates a Lykke entity.
+            </summary>
+            <param name="model">The Lykke entity update information.</param>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.DeleteLykkeEntityAsync(System.String)">
+            <summary>
+            Deletes a Lykke entity.
+            </summary>
+            <param name="lykkeEntityId">The Lykke entity id.</param>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.GetDisclaimersAsync(System.String)">
+            <summary>
+            Returns a collection of Lykke entity disclaimers.
+            </summary>
+            <param name="lykkeEntityId">The Lykke entity id.</param>
+            <returns>A collection of Lykke entity disclaimers.</returns>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.GetDisclaimerAsync(System.String,System.String)">
+            <summary>
+            Returns a Lykke entity disclaimer.
+            </summary>
+            <param name="lykkeEntityId">The Lykke entity id.</param>
+            <param name="disclaimerId">The disclaimer id.</param>
+            <returns>A Lykke entity disclaimer.</returns>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.AddDisclaimerAsync(Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.CreateDisclaimerModel)">
+            <summary>
+            Creates a Lykke entity disclaimer.
+            </summary>
+            <param name="model">The Lykke entity disclaimer creation information.</param>
+            <returns>The Lykke entity disclaimer.</returns>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.UpdateDisclaimerAsync(Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.EditDisclaimerModel)">
+            <summary>
+            Updates a Lykke entity disclaimer.
+            </summary>
+            <param name="model">The Lykke entity disclaimer update information.</param>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.DeleteDisclaimerAsync(System.String,System.String)">
+            <summary>
+            Deletes a Lykke entity disclaimer.
+            </summary>
+            <param name="lykkeEntityId">The Lykke entity id.</param>
+            <param name="disclaimerId">The disclaimer id.</param>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.GetApprovedClientDisclaimersAsync(System.String)">
+            <summary>
+            Returns client approved disclaimers.
+            </summary>
+            <param name="clientId">The client id.</param>
+            <returns>A collection of disclaimers.</returns>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.GetPendingClientDisclaimersAsync(System.String)">
+            <summary>
+            Returns client disclaimers requires approval.
+            </summary>
+            <param name="clientId">The client id.</param>
+            <returns>A collection of disclaimers.</returns>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.CheckTradableClientDisclaimerAsync(System.String,System.String,System.String)">
+            <summary>
+            Finds an actual for today tradable disclaimer by higher priority Lykke entity and requires client approval if it has not yet been approved.
+            </summary>
+            <param name="clientId">The client id.</param>
+            <param name="lykkeEntityId1">The Lykke entity id.</param>
+            <param name="lykkeEntityId2">The Lykke entity id.</param>
+            <returns>A check result.</returns>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.CheckDepositClientDisclaimerAsync(System.String,System.String)">
+            <summary>
+            Finds an actual for today deposit disclaimer by Lykke entity and requires client approval if it has not yet been approved.
+            </summary>
+            <param name="clientId">The client id.</param>
+            <param name="lykkeEntityId">The Lykke entity id.</param>
+            <returns>A check result.</returns>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.CheckWithdrawalClientDisclaimerAsync(System.String,System.String)">
+            <summary>
+            Finds an actual for today withdrawal disclaimer by Lykke entity and requires client approval if it has not yet been approved.
+            </summary>
+            <param name="clientId">The client id.</param>
+            <param name="lykkeEntityId">The Lykke entity id.</param>
+            <returns>A check result.</returns>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.ApproveClientDisclaimerAsync(System.String,System.String)">
+            <summary>
+            Sets client disclimer as approved. 
+            </summary>
+            <param name="clientId">The client id.</param>
+            <param name="disclaimerId">The disclaimer id.</param>
+        </member>
+        <member name="M:Lykke.Service.AssetDisclaimers.Client.IAssetDisclaimersClient.DeclineClientDisclaimerAsync(System.String,System.String)">
+            <summary>
+            Sets client disclimer as declined. 
+            </summary>
+            <param name="clientId">The client id.</param>
+            <param name="disclaimerId">The disclaimer id.</param>
+        </member>
+        <member name="T:Lykke.Service.AssetDisclaimers.Client.Models.ClientDisclaimers.CheckResultModel">
+            <summary>
+            Represents a check client disclaimers result.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.ClientDisclaimers.CheckResultModel.RequiresApproval">
+            <summary>
+            If <c>true</c> client have an unaproved disclaimers, otherwise <c>false</c>.
+            </summary>
+        </member>
+        <member name="T:Lykke.Service.AssetDisclaimers.Client.Models.ClientDisclaimers.ClientDisclaimerModel">
+            <summary>
+            Represens a client disclaimer details.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.ClientDisclaimers.ClientDisclaimerModel.Id">
+            <summary>
+            The disclaimer id.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.ClientDisclaimers.ClientDisclaimerModel.LykkeEntityId">
+            <summary>
+            The Lykke entity id.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.ClientDisclaimers.ClientDisclaimerModel.Type">
+            <summary>
+            The disclaimer type.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.ClientDisclaimers.ClientDisclaimerModel.Name">
+            <summary>
+            The disclaimer name.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.ClientDisclaimers.ClientDisclaimerModel.Text">
+            <summary>
+            The disclaimer text.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.ClientDisclaimers.ClientDisclaimerModel.StartDate">
+            <summary>
+            The disclaimer start date.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.ClientDisclaimers.ClientDisclaimerModel.ApprovedDate">
+            <summary>
+            The disclaimer approved date.
+            </summary>
+        </member>
+        <member name="T:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.CreateDisclaimerModel">
+            <summary>
+            Represents disclaimer creation information.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.CreateDisclaimerModel.LykkeEntityId">
+            <summary>
+            The Lykke entity id.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.CreateDisclaimerModel.Type">
+            <summary>
+            The disclaimer type.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.CreateDisclaimerModel.Name">
+            <summary>
+            The disclaimer name.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.CreateDisclaimerModel.Text">
+            <summary>
+            The disclaimer text.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.CreateDisclaimerModel.StartDate">
+            <summary>
+            The disclaimer start date.
+            </summary>
+        </member>
+        <member name="T:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerModel">
+            <summary>
+            Represents a disclaimer.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerModel.Id">
+            <summary>
+            The disclaimer id.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerModel.LykkeEntityId">
+            <summary>
+            The Lykke entity id.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerModel.Type">
+            <summary>
+            The disclaimer type.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerModel.Name">
+            <summary>
+            The disclaimer name.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerModel.Text">
+            <summary>
+            The disclaimer text.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerModel.StartDate">
+            <summary>
+            The disclaimer start date.
+            </summary>
+        </member>
+        <member name="T:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerType">
+            <summary>
+            Contains disclaimer types.
+            </summary>
+        </member>
+        <member name="F:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerType.None">
+            <summary>
+            Undefined.
+            </summary>
+        </member>
+        <member name="F:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerType.Tradable">
+            <summary>
+            The tradable disclaimer.
+            </summary>
+        </member>
+        <member name="F:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerType.Deposit">
+            <summary>
+            The deposit disclaimer.
+            </summary>
+        </member>
+        <member name="F:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerType.Withdrawal">
+            <summary>
+            The withdrawal disclaimer.
+            </summary>
+        </member>
+        <member name="T:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.EditDisclaimerModel">
+            <summary>
+            Represents disclaimer edit information.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.EditDisclaimerModel.Id">
+            <summary>
+            The disclaimer id.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.EditDisclaimerModel.LykkeEntityId">
+            <summary>
+            The Lykke entity id.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.EditDisclaimerModel.Type">
+            <summary>
+            The disclaimer type.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.EditDisclaimerModel.Name">
+            <summary>
+            The disclaimer name.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.EditDisclaimerModel.Text">
+            <summary>
+            The disclaimer text.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.EditDisclaimerModel.StartDate">
+            <summary>
+            The disclaimer start date.
+            </summary>
+        </member>
+        <member name="T:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.CreateLykkeEntityModel">
+            <summary>
+            Represents Lykke entity creation information.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.CreateLykkeEntityModel.Id">
+            <summary>
+            The Lykke entity id.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.CreateLykkeEntityModel.Name">
+            <summary>
+            The Lykke entity name.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.CreateLykkeEntityModel.Description">
+            <summary>
+            The Lykke entity description.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.CreateLykkeEntityModel.Priority">
+            <summary>
+            The Lykke entity priority.
+            </summary>
+        </member>
+        <member name="T:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.EditLykkeEntityModel">
+            <summary>
+            Represents Lykke entity edit information.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.EditLykkeEntityModel.Id">
+            <summary>
+            The Lykke entity id.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.EditLykkeEntityModel.Name">
+            <summary>
+            The Lykke entity name.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.EditLykkeEntityModel.Description">
+            <summary>
+            The Lykke entity description.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.EditLykkeEntityModel.Priority">
+            <summary>
+            The Lykke entity priority.
+            </summary>
+        </member>
+        <member name="T:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.LykkeEntityModel">
+            <summary>
+            Represents a Lykke entity.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.LykkeEntityModel.Id">
+            <summary>
+            The Lykke entity id.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.LykkeEntityModel.Name">
+            <summary>
+            The Lykke entity name.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.LykkeEntityModel.Description">
+            <summary>
+            The Lykke entity description.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.LykkeEntityModel.Priority">
+            <summary>
+            The Lykke entity priority.
             </summary>
         </member>
     </members>

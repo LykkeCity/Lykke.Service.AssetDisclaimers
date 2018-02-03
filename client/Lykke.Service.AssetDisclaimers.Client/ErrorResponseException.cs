@@ -10,10 +10,21 @@ namespace Lykke.Service.AssetDisclaimers.Client
     /// </summary>
     public class ErrorResponseException : Exception
     {
+        /// <summary>
+        /// Gets a response error details.
+        /// </summary>
         public ErrorResponse Error { get; }
 
+        /// <summary>
+        /// Gets a http response status code.
+        /// </summary>
         public HttpStatusCode StatusCode { get; }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="ErrorResponseException"/> with response error details and API excepiton.
+        /// </summary>
+        /// <param name="error">The response error details</param>
+        /// <param name="inner">The exception occurred during calling service API.</param>
         public ErrorResponseException(ErrorResponse error, ApiException inner) :
             base(error.GetSummaryMessage() ?? string.Empty, inner)
         {
