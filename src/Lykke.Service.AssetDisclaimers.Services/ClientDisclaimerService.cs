@@ -57,7 +57,7 @@ namespace Lykke.Service.AssetDisclaimers.Services
             
             ILykkeEntity lykkeEntity2 = await _lykkeEntityRepository.GetAsync(lykkeEntityId2);
 
-            if(lykkeEntity1 == null)
+            if(lykkeEntity2 == null)
                 throw new LykkeEntityNotFoundException(lykkeEntityId2);
 
             ILykkeEntity lykkeEntity = lykkeEntity1.Priority > lykkeEntity2.Priority ? lykkeEntity1 : lykkeEntity2; 
