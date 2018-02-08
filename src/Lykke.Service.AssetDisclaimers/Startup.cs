@@ -58,6 +58,7 @@ namespace Lykke.Service.AssetDisclaimers
 
                 Mapper.Initialize(cfg =>
                 {
+                    cfg.AddProfiles(typeof(AzureRepositories.AutoMapperProfile));
                     cfg.AddProfiles(typeof(AutoMapperProfile));
                 });
 
