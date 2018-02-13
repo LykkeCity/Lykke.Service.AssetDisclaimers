@@ -122,6 +122,17 @@ namespace Lykke.Service.AssetDisclaimers.Services
 
         private async Task<bool> CheckDisclaimerAsync(string clientId, string lykkeEntityId, DisclaimerType type)
         {
+            IReadOnlyList<IDisclaimer> disclaimers = await _disclaimerRepository.GetAsync(lykkeEntityId);
+
+            IDisclaimer requiresApprovalDisclaimer = disclaimers
+                .Where(o => o.Type == type)
+                .Where(o => o.StartDate < DateTime.UtcNow)
+                .OrderByDescending(p => p.StartDate)
+                .FirstOrDefault();
+
+            if (requiresApprovalDisclaimer == null)
+                return false;
+            
             IReadOnlyList<IClientDisclaimer> clientDisclaimers = await _clientDisclaimerRepository.GetAsync(clientId);
 
             HashSet<string> approvedDisclaimers = clientDisclaimers
@@ -129,15 +140,7 @@ namespace Lykke.Service.AssetDisclaimers.Services
                 .Select(o => o.DisclaimerId)
                 .ToHashSet();
             
-            IReadOnlyList<IDisclaimer> disclaimers = await _disclaimerRepository.GetAsync(lykkeEntityId);
-
-            IDisclaimer requiresApprovalDisclaimer = disclaimers
-                .Where(o => o.Type == type)
-                .Where(o => o.StartDate < DateTime.UtcNow && !approvedDisclaimers.Contains(o.Id))
-                .OrderByDescending(p => p.StartDate)
-                .FirstOrDefault();
-
-            if (requiresApprovalDisclaimer == null)
+            if (approvedDisclaimers.Contains(requiresApprovalDisclaimer.Id))
                 return false;
             
             await _clientDisclaimerRepository.InsertOrReplaceAsync(new ClientDisclaimer
