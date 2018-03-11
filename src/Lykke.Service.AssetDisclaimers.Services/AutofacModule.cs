@@ -1,10 +1,18 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using Lykke.Service.AssetDisclaimers.Core.Services;
 
 namespace Lykke.Service.AssetDisclaimers.Services
 {
     public class AutofacModule : Module
     {
+        private readonly TimeSpan _pendingTimeout;
+
+        public AutofacModule(TimeSpan pendingTimeout)
+        {
+            _pendingTimeout = pendingTimeout;
+        }
+
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<HealthService>()
@@ -24,7 +32,8 @@ namespace Lykke.Service.AssetDisclaimers.Services
                 .As<ILykkeEntityService>();
             
             builder.RegisterType<ClientDisclaimerService>()
-                .As<IClientDisclaimerService>();
+                .As<IClientDisclaimerService>()
+                .WithParameter(TypedParameter.From(_pendingTimeout));
         }
     }
 }

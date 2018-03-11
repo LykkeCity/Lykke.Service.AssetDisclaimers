@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -58,7 +57,7 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
                     continue;
 
                 var clientDisclaimerModel = Mapper.Map<ClientDisclaimerModel>(disclaimer);
-                clientDisclaimerModel.ApprovedDate = clientDisclaimer.ApprovedDate ?? DateTime.UtcNow;
+                clientDisclaimerModel.ApprovedDate = clientDisclaimer.ApprovedDate;
 
                 model.Add(clientDisclaimerModel);
             }
