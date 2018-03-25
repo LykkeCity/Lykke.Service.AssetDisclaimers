@@ -7,6 +7,6 @@ namespace Lykke.Service.AssetDisclaimers.Core.Domain
         string ClientId { get; }
         string DisclaimerId { get; }
         bool Approved { get; }
-        DateTime? ApprovedDate { get; }
+        DateTime ApprovedDate { get; }
     }
 }

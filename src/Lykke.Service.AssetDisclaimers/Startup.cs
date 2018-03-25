@@ -69,7 +69,8 @@ namespace Lykke.Service.AssetDisclaimers
 
                 Log = CreateLogWithSlack(services, appSettings);
 
-                builder.RegisterModule(new Services.AutofacModule());
+                builder.RegisterModule(new Services.AutofacModule(
+                    appSettings.CurrentValue.AssetDisclaimersService.PendingTimeout));
                 builder.RegisterModule(new AzureRepositories.AutofacModule(
                     appSettings.Nested(o => o.AssetDisclaimersService.Db.DataConnectionString), Log));
                 builder.RegisterModule(new AutofacModule(Log));

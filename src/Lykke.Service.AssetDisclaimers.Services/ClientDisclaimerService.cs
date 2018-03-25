@@ -16,17 +16,20 @@ namespace Lykke.Service.AssetDisclaimers.Services
         private readonly IClientDisclaimerRepository _clientDisclaimerRepository;
         private readonly ILykkeEntityRepository _lykkeEntityRepository;
         private readonly IDisclaimerRepository _disclaimerRepository;
+        private readonly TimeSpan _pendingTimeout;
         private readonly ILog _log;
 
         public ClientDisclaimerService(
             IClientDisclaimerRepository clientDisclaimerRepository,
             ILykkeEntityRepository lykkeEntityRepository,
             IDisclaimerRepository disclaimerRepository,
+            TimeSpan pendingTimeout,
             ILog log)
         {
             _clientDisclaimerRepository = clientDisclaimerRepository;
             _lykkeEntityRepository = lykkeEntityRepository;
             _disclaimerRepository = disclaimerRepository;
+            _pendingTimeout = pendingTimeout;
             _log = log;
         }
         
@@ -44,7 +47,7 @@ namespace Lykke.Service.AssetDisclaimers.Services
             IReadOnlyList<IClientDisclaimer> clientDisclaimers = await _clientDisclaimerRepository.GetAsync(clientId);
 
             return clientDisclaimers
-                .Where(o => !o.Approved)
+                .Where(o => !o.Approved && o.ApprovedDate.Add(_pendingTimeout) > DateTime.UtcNow)
                 .ToList();
         }
 
@@ -146,7 +149,8 @@ namespace Lykke.Service.AssetDisclaimers.Services
             await _clientDisclaimerRepository.InsertOrReplaceAsync(new ClientDisclaimer
             {
                 ClientId = clientId,
-                DisclaimerId = requiresApprovalDisclaimer.Id
+                DisclaimerId = requiresApprovalDisclaimer.Id,
+                ApprovedDate = DateTime.UtcNow
             });
                 
             await _log.WriteInfoAsync(nameof(ClientDisclaimerService), nameof(CheckTradableAsync),

@@ -33,6 +33,7 @@ namespace Lykke.Service.AssetDisclaimers.Services.Tests
                 _clientDisclaimerRepositoryMock.Object,
                 _lykkeEntityRepositoryMock.Object,
                 _disclaimerRepositoryMock.Object,
+                new TimeSpan(0, 1, 0),
                 _logMock.Object);
         }
 
