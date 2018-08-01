@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -87,6 +88,11 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
 
                 if (disclaimer != null)
                     disclaimers.Add(disclaimer);
+            }
+
+            if (disclaimers.Any())
+            {
+                await _log.WriteInfoAsync(nameof(ClientDisclaimersController), nameof(GetPendingAsync), clientId, disclaimers.ToJson());
             }
 
             var model = Mapper.Map<List<DisclaimerModel>>(disclaimers);
@@ -219,7 +225,7 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
             }
             catch (DisclaimerNotFoundException exception)
             {
-                await _log.WriteErrorAsync(nameof(ClientDisclaimersController), nameof(ApproveAsync),
+                await _log.WriteWarningAsync(nameof(ClientDisclaimersController), nameof(ApproveAsync),
                     new
                     {
                         clientId,
