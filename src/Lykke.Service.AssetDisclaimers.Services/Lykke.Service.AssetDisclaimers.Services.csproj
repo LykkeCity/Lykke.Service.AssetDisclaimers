@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Lykke.Service.AssetDisclaimers.Services</AssemblyName>
     <RootNamespace>Lykke.Service.AssetDisclaimers.Services</RootNamespace>
     <Version>1.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lykke.Service.AssetDisclaimers.Core\Lykke.Service.AssetDisclaimers.Core.csproj" />
+    <PackageReference Include="Lykke.Common" Version="7.3.0" />
+    <PackageReference Include="Lykke.Payments.FxPaygate.Client" Version="1.0.9" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Lykke.Common" Version="5.0.0" />
+    <ProjectReference Include="..\Lykke.Service.AssetDisclaimers.Core\Lykke.Service.AssetDisclaimers.Core.csproj" />
   </ItemGroup>
 </Project>
