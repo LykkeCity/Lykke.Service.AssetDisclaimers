@@ -11,6 +11,7 @@ using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
 using Lykke.Service.AssetDisclaimers.Core.Services;
+using Lykke.Service.AssetDisclaimers.Modules;
 using Lykke.Service.AssetDisclaimers.Settings;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
@@ -69,11 +70,11 @@ namespace Lykke.Service.AssetDisclaimers
 
                 Log = CreateLogWithSlack(services, appSettings);
 
-                builder.RegisterModule(new Services.AutofacModule(
-                    appSettings.CurrentValue.AssetDisclaimersService.PendingTimeout));
+                builder.RegisterModule(new ServicesModule(
+                    appSettings.CurrentValue.AssetDisclaimersService));
                 builder.RegisterModule(new AzureRepositories.AutofacModule(
                     appSettings.Nested(o => o.AssetDisclaimersService.Db.DataConnectionString), Log));
-                builder.RegisterModule(new AutofacModule(Log));
+                builder.RegisterModule(new ClientsModule(Log, appSettings.CurrentValue));
                 builder.Populate(services);
                 ApplicationContainer = builder.Build();
 
