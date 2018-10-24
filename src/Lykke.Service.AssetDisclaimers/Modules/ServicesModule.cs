@@ -1,16 +1,18 @@
 ﻿using System;
 using Autofac;
 using Lykke.Service.AssetDisclaimers.Core.Services;
+using Lykke.Service.AssetDisclaimers.Services;
+using Lykke.Service.AssetDisclaimers.Settings.ServiceSettings;
 
-namespace Lykke.Service.AssetDisclaimers.Services
+namespace Lykke.Service.AssetDisclaimers.Modules
 {
-    public class AutofacModule : Module
+    public class ServicesModule : Module
     {
-        private readonly TimeSpan _pendingTimeout;
+        private readonly AssetDisclaimersSettings _settings;
 
-        public AutofacModule(TimeSpan pendingTimeout)
+        public ServicesModule(AssetDisclaimersSettings settings)
         {
-            _pendingTimeout = pendingTimeout;
+            _settings = settings;
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -33,7 +35,8 @@ namespace Lykke.Service.AssetDisclaimers.Services
             
             builder.RegisterType<ClientDisclaimerService>()
                 .As<IClientDisclaimerService>()
-                .WithParameter(TypedParameter.From(_pendingTimeout));
+                .WithParameter(TypedParameter.From(_settings.PendingTimeout))
+                .WithParameter(TypedParameter.From(_settings.DepositDelayDisclaimerId));
         }
     }
 }
