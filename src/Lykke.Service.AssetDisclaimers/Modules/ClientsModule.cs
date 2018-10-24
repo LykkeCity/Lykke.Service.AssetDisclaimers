@@ -22,8 +22,6 @@ namespace Lykke.Service.AssetDisclaimers.Modules
                 .As<ILog>()
                 .SingleInstance();
 
-            _appSettings.FxPaygateServiceClient.ServiceUrl = "http://localhost:50942";
-
             builder.RegisterFxPaygateClient(_appSettings.FxPaygateServiceClient);
         }
     }
