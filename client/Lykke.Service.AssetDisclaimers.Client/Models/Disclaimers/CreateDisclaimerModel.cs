@@ -31,5 +31,10 @@ namespace Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers
         /// The disclaimer start date.
         /// </summary>
         public DateTime StartDate { get; set; }
+
+        /// <summary>
+        /// If true, then disclaimer will be shown on each action
+        /// </summary>
+        public bool ShowOnEachAction { get; set; }
     }
 }
