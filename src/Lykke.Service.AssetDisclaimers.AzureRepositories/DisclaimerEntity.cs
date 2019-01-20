@@ -47,5 +47,7 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
                 MarkValueTypePropertyAsDirty(nameof(StartDate));
             }
         }
+
+        public bool ShowOnEachAction { get; set; }
     }
 }
