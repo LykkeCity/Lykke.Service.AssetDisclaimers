@@ -36,5 +36,11 @@ namespace Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers
         /// The disclaimer start date.
         /// </summary>
         public DateTime StartDate { get; set; }
+
+        /// <summary>
+        /// Disclaimer will require approve for each operation
+        /// E.g. trade attempt -> disclaimer shown -> approved -> one trade allowed -> disclaimer will appear for next trade
+        /// </summary>
+        public bool ShowOnEachAction { get; set; }
     }
 }

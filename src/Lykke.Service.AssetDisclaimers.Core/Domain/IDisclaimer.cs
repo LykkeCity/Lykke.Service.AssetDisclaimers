@@ -10,5 +10,6 @@ namespace Lykke.Service.AssetDisclaimers.Core.Domain
         string Name { get; }
         string Text { get; }
         DateTime StartDate { get; }
+        bool ShowOnEachAction { get; }
     }
 }
