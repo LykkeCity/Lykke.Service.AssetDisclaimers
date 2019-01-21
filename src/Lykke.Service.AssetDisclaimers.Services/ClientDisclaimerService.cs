@@ -157,7 +157,14 @@ namespace Lykke.Service.AssetDisclaimers.Services
                 .ToHashSet();
             
             if (approvedDisclaimers.Contains(requiresApprovalDisclaimer.Id))
+            {
+                if (requiresApprovalDisclaimer.ShowOnEachAction)
+                {
+                    await _clientDisclaimerRepository.DeleteAsync(clientId, requiresApprovalDisclaimer.Id);
+                }
+
                 return false;
+            }
             
             await _clientDisclaimerRepository.InsertOrReplaceAsync(new ClientDisclaimer
             {

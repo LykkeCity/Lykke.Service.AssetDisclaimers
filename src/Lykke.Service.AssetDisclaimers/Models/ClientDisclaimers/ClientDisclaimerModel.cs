@@ -15,5 +15,6 @@ namespace Lykke.Service.AssetDisclaimers.Models.ClientDisclaimers
         public string Text { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime ApprovedDate { get; set; }
+        public bool ShowOnEachAction { get; set; }
     }
 }

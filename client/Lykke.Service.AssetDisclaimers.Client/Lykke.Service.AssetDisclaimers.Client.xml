@@ -290,6 +290,11 @@
             The disclaimer approved date.
             </summary>
         </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.ClientDisclaimers.ClientDisclaimerModel.ShowOnEachAction">
+            <summary>
+            If true, then disclaimer will be shown on each action
+            </summary>
+        </member>
         <member name="T:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.CreateDisclaimerModel">
             <summary>
             Represents disclaimer creation information.
@@ -318,6 +323,11 @@
         <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.CreateDisclaimerModel.StartDate">
             <summary>
             The disclaimer start date.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.CreateDisclaimerModel.ShowOnEachAction">
+            <summary>
+            If true, then disclaimer will be shown on each action
             </summary>
         </member>
         <member name="T:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerModel">
@@ -353,6 +363,12 @@
         <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerModel.StartDate">
             <summary>
             The disclaimer start date.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerModel.ShowOnEachAction">
+            <summary>
+            Disclaimer will require approve for each operation
+            E.g. trade attempt -> disclaimer shown -> approved -> one trade allowed -> disclaimer will appear for next trade
             </summary>
         </member>
         <member name="T:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.DisclaimerType">
@@ -413,6 +429,12 @@
         <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.EditDisclaimerModel.StartDate">
             <summary>
             The disclaimer start date.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.AssetDisclaimers.Client.Models.Disclaimers.EditDisclaimerModel.ShowOnEachAction">
+            <summary>
+            Disclaimer will require approve for each operation
+            E.g. trade attempt -> disclaimer shown -> approved -> one trade allowed -> disclaimer will appear for next trade
             </summary>
         </member>
         <member name="T:Lykke.Service.AssetDisclaimers.Client.Models.LykkeEntities.CreateLykkeEntityModel">

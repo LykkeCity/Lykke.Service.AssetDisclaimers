@@ -23,5 +23,7 @@ namespace Lykke.Service.AssetDisclaimers.Models.Disclaimers
         
         [Required]
         public DateTime StartDate { get; set; }
+
+        public bool ShowOnEachAction { get; set; }
     }
 }
