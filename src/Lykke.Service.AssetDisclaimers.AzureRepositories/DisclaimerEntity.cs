@@ -11,7 +11,8 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
     {
         private DisclaimerType _type;
         private DateTime _startDate;
-        
+        private bool _showOnEachAction;
+
         public DisclaimerEntity()
         {
         }
@@ -48,6 +49,14 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
             }
         }
 
-        public bool ShowOnEachAction { get; set; }
+        public bool ShowOnEachAction
+        {
+            get => _showOnEachAction;
+            set
+            {
+                _showOnEachAction = value;
+                MarkValueTypePropertyAsDirty(nameof(ShowOnEachAction));
+            }
+        }
     }
 }
