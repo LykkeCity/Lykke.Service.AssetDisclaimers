@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AzureStorage;
@@ -14,6 +16,8 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
         private readonly INoSQLTableStorage<DisclaimerEntity> _storage;
         private readonly INoSQLTableStorage<AzureIndex> _disclaimerIdIndexStorage;
 
+        private readonly ConcurrentDictionary<string, List<Disclaimer>> _disclaimerListsByLykkeEntityId = new ConcurrentDictionary<string, List<Disclaimer>>();
+
         public DisclaimerRepository(
             INoSQLTableStorage<DisclaimerEntity> storage,
             INoSQLTableStorage<AzureIndex> disclaimerIdIndexStorage)
@@ -24,17 +28,17 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
         
         public async Task<IReadOnlyList<IDisclaimer>> GetAsync(string lykkeEntityId)
         {
-            IEnumerable<DisclaimerEntity> entities = await _storage.GetDataAsync(GetPartitionKey(lykkeEntityId));
+            var disclaimerList = await GetDisclaimerListByEntity(lykkeEntityId);
 
-            return Mapper.Map<List<Disclaimer>>(entities);
+            return Mapper.Map<List<Disclaimer>>(disclaimerList);
         }
 
         public async Task<IDisclaimer> GetAsync(string lykkeEntityId, string disclaimerId)
         {
-            DisclaimerEntity entity =
-                await _storage.GetDataAsync(GetPartitionKey(lykkeEntityId), GetRowKey(disclaimerId));
+            var disclaimerList = await GetDisclaimerListByEntity(lykkeEntityId);
+            var disclaimer = disclaimerList.FirstOrDefault(e => e.Id == disclaimerId);
 
-            return Mapper.Map<Disclaimer>(entity);
+            return disclaimer;
         }
 
         public async Task<IDisclaimer> FindAsync(string disclaimerId)
@@ -61,10 +65,11 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
                 GetDisclaimerIdIndexRowKey(), entity);
             
             await _disclaimerIdIndexStorage.InsertAsync(index);
-            
+
+            await UpdateDisclaimerListByEntity(disclaimer.LykkeEntityId);
+
             return Mapper.Map<Disclaimer>(entity);
         }
-        
 
         public async Task UpdateAsync(IDisclaimer disclaimer)
         {
@@ -73,6 +78,8 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
                 Mapper.Map(disclaimer, entity);
                 return entity;
             });
+
+            await UpdateDisclaimerListByEntity(disclaimer.LykkeEntityId);
         }
 
         public async Task DeleteAsync(string lykkeEntityId, string disclaimerId)
@@ -80,6 +87,8 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
             await _storage.DeleteAsync(GetPartitionKey(lykkeEntityId), GetRowKey(disclaimerId));
             await _disclaimerIdIndexStorage
                 .DeleteAsync(GetDisclaimerIdIndexPartitionKey(disclaimerId), GetDisclaimerIdIndexRowKey());
+
+            await UpdateDisclaimerListByEntity(lykkeEntityId);
         }
         
         private static string GetPartitionKey(string lykkeEntityId)
@@ -96,5 +105,24 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
 
         private static string GetDisclaimerIdIndexRowKey()
             => "DisclaimerLykkeEntityIndex";
+
+        private async Task<List<Disclaimer>> GetDisclaimerListByEntity(string lykkeEntityId)
+        {
+            if (!_disclaimerListsByLykkeEntityId.TryGetValue(lykkeEntityId, out var disclaimerList))
+            {
+                disclaimerList = await UpdateDisclaimerListByEntity(lykkeEntityId);
+            }
+
+            return disclaimerList;
+        }
+
+        private async Task<List<Disclaimer>> UpdateDisclaimerListByEntity(string lykkeEntityId)
+        {
+            var entities = await _storage.GetDataAsync(GetPartitionKey(lykkeEntityId));
+            var disclaimerList = Mapper.Map<List<Disclaimer>>(entities);
+            _disclaimerListsByLykkeEntityId[lykkeEntityId] = disclaimerList;
+            return disclaimerList;
+        }
+
     }
 }

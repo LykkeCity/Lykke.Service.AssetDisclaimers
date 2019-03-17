@@ -92,7 +92,8 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
 
             if (disclaimers.Any())
             {
-                await _log.WriteInfoAsync(nameof(ClientDisclaimersController), nameof(GetPendingAsync), clientId, disclaimers.ToJson());
+                var disclaimersContext = disclaimers.Select(e => new { e.Id, e.Name, e.LykkeEntityId, e.StartDate, e.Type}).ToJson();
+                await _log.WriteInfoAsync(nameof(ClientDisclaimersController), nameof(GetPendingAsync), clientId, $"disclaimers list for client: {disclaimersContext}");
             }
 
             var model = Mapper.Map<List<DisclaimerModel>>(disclaimers);
