@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common.Log;
-using Lykke.Payments.FxPaygate.Client;
+using Lykke.Payments.EasyPaymentGateway.Client;
 using Lykke.Service.AssetDisclaimers.Core.Domain;
 using Lykke.Service.AssetDisclaimers.Core.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -25,8 +25,8 @@ namespace Lykke.Service.AssetDisclaimers.Services.Tests
         private readonly Mock<ILog> _logMock =
             new Mock<ILog>();
 
-        private readonly Mock<IFxPaygateClient> _fxPaygateClientMock = 
-            new Mock<IFxPaygateClient>();
+        private readonly Mock<IEasyPaymentGatewayClient> _easyPaymentGatewayClientMock = 
+            new Mock<IEasyPaymentGatewayClient>();
         
         private ClientDisclaimerService _service;
         
@@ -37,7 +37,7 @@ namespace Lykke.Service.AssetDisclaimers.Services.Tests
                 _clientDisclaimerRepositoryMock.Object,
                 _lykkeEntityRepositoryMock.Object,
                 _disclaimerRepositoryMock.Object,
-                _fxPaygateClientMock.Object,
+                _easyPaymentGatewayClientMock.Object,
                 new TimeSpan(0, 1, 0),
                 Guid.NewGuid().ToString(),
                 _logMock.Object);
