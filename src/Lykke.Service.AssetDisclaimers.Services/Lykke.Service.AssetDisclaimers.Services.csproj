@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Lykke.Common" Version="7.3.0" />
-    <PackageReference Include="Lykke.Payments.FxPaygate.Client" Version="1.0.9" />
+    <PackageReference Include="Lykke.Payments.EasyPaymentGateway.Client" Version="1.0.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lykke.Service.AssetDisclaimers.Core\Lykke.Service.AssetDisclaimers.Core.csproj" />

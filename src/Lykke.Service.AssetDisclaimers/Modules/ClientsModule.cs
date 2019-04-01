@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using Common.Log;
-using Lykke.Payments.FxPaygate.Client;
+using Lykke.Payments.EasyPaymentGateway.Client;
 using Lykke.Service.AssetDisclaimers.Settings;
 
 namespace Lykke.Service.AssetDisclaimers.Modules
@@ -22,7 +22,7 @@ namespace Lykke.Service.AssetDisclaimers.Modules
                 .As<ILog>()
                 .SingleInstance();
 
-            builder.RegisterFxPaygateClient(_appSettings.FxPaygateServiceClient);
+            builder.RegisterEasyPaymentGatewayClient(_appSettings.EasyPaymentGatewayServiceClient);
         }
     }
 }

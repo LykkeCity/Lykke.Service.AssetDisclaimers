@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
-using Lykke.Payments.FxPaygate.Client;
+using Lykke.Payments.EasyPaymentGateway.Client;
 using Lykke.Service.AssetDisclaimers.Core.Domain;
 using Lykke.Service.AssetDisclaimers.Core.Exceptions;
 using Lykke.Service.AssetDisclaimers.Core.Repositories;
@@ -19,14 +19,14 @@ namespace Lykke.Service.AssetDisclaimers.Services
         private readonly IDisclaimerRepository _disclaimerRepository;
         private readonly TimeSpan _pendingTimeout;
         private readonly string _depositDelayDisclaimerId;
-        private readonly IFxPaygateClient _fxPaygateClient;
+        private readonly IEasyPaymentGatewayClient _easyPaymentGatewayClient;
         private readonly ILog _log;
 
         public ClientDisclaimerService(
             IClientDisclaimerRepository clientDisclaimerRepository,
             ILykkeEntityRepository lykkeEntityRepository,
             IDisclaimerRepository disclaimerRepository,
-            IFxPaygateClient fxPaygateClient,
+            IEasyPaymentGatewayClient easyPaymentGatewayClient,
             TimeSpan pendingTimeout,
             string depositDelayDisclaimerId,
             ILog log)
@@ -36,7 +36,7 @@ namespace Lykke.Service.AssetDisclaimers.Services
             _disclaimerRepository = disclaimerRepository;
             _pendingTimeout = pendingTimeout;
             _depositDelayDisclaimerId = depositDelayDisclaimerId;
-            _fxPaygateClient = fxPaygateClient;
+            _easyPaymentGatewayClient = easyPaymentGatewayClient;
             _log = log;
         }
         
@@ -83,7 +83,7 @@ namespace Lykke.Service.AssetDisclaimers.Services
                 throw new LykkeEntityNotFoundException(lykkeEntityId);
 
             if (!string.IsNullOrEmpty(_depositDelayDisclaimerId) && 
-                !await _fxPaygateClient.IsClientSuspicious(clientId))
+                !await _easyPaymentGatewayClient.Api.IsClientSuspicious(clientId))
             {
                 await ApproveAsync(clientId, _depositDelayDisclaimerId);
             }
