@@ -28,6 +28,12 @@ namespace Lykke.Service.AssetDisclaimers.AzureRepositories
             return Mapper.Map<List<ClientDisclaimer>>(entities);
         }
 
+        public async Task<IClientDisclaimer> GetAsync(string clientId, string disclaimerId)
+        {
+            var entity = await _storage.GetDataAsync(GetPartitionKey(clientId), GetRowKey(disclaimerId));
+            return Mapper.Map<ClientDisclaimer>(entity);
+        }
+
         public async Task<IReadOnlyList<IClientDisclaimer>> FindAsync(string disclaimerId)
         {
             IEnumerable<AzureIndex> indexes = await _disclaimerIdIndexStorage

@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
-using Common;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Common.Log;
 using Lykke.Service.AssetDisclaimers.Core.Domain;
 using Lykke.Service.AssetDisclaimers.Core.Exceptions;
 using Lykke.Service.AssetDisclaimers.Core.Services;
 using Lykke.Service.AssetDisclaimers.Extensions;
 using Lykke.Service.AssetDisclaimers.Models.Disclaimers;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Lykke.Service.AssetDisclaimers.Controllers
 {
@@ -24,10 +24,10 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
 
         public DisclaimersController(
             IDisclaimerService disclaimerService,
-            ILog log)
+            ILogFactory logFactory)
         {
             _disclaimerService = disclaimerService;
-            _log = log;
+            _log = logFactory.CreateLog(this);
         }
         
         /// <summary>
@@ -103,8 +103,7 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
             }
             catch (LykkeEntityNotFoundException exception)
             {
-                await _log.WriteErrorAsync(nameof(DisclaimersController), nameof(AddAsync),
-                    model.ToJson(), exception);
+                _log.Error(exception, context: model);
                 return NotFound(ErrorResponse.Create(exception.Message));
             }
 
@@ -138,8 +137,7 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
             }
             catch (DisclaimerNotFoundException exception)
             {
-                await _log.WriteErrorAsync(nameof(DisclaimersController), nameof(UpdateAsync),
-                    model.ToJson(), exception);
+                _log.Error(exception, context: model);
                 return NotFound(ErrorResponse.Create(exception.Message));
             }
 
@@ -166,8 +164,7 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
             }
             catch (InvalidOperationException exception)
             {
-                await _log.WriteErrorAsync(nameof(DisclaimersController), nameof(DeleteAsync),
-                    new {lykkeEntityId}.ToJson(), exception);
+                _log.Error(exception, context: new {lykkeEntityId});
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 

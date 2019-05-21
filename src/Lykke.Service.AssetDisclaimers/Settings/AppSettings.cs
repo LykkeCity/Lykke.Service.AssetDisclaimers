@@ -1,13 +1,14 @@
-﻿using Lykke.Payments.FxPaygate.Client;
+﻿using JetBrains.Annotations;
+using Lykke.Payments.FxPaygate.Client;
+using Lykke.Sdk.Settings;
 using Lykke.Service.AssetDisclaimers.Settings.ServiceSettings;
-using Lykke.Service.AssetDisclaimers.Settings.SlackNotifications;
 
 namespace Lykke.Service.AssetDisclaimers.Settings
 {
-    public class AppSettings
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+    public class AppSettings : BaseAppSettings
     {
         public AssetDisclaimersSettings AssetDisclaimersService { get; set; }
-        public SlackNotificationsSettings SlackNotifications { get; set; }
         public FxPaygateClientSettings FxPaygateServiceClient { get; set; }
     }
 }

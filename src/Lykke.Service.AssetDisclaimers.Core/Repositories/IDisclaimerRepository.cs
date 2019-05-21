@@ -6,9 +6,7 @@ namespace Lykke.Service.AssetDisclaimers.Core.Repositories
 {
     public interface IDisclaimerRepository
     {
-        Task<IReadOnlyList<IDisclaimer>> GetAsync(string lykkeEntityId);
-
-        Task<IDisclaimer> GetAsync(string lykkeEntityId, string disclaimerId);
+        Task<IReadOnlyList<IDisclaimer>> GetAllAsync();
 
         Task<IDisclaimer> FindAsync(string disclaimerId);
         

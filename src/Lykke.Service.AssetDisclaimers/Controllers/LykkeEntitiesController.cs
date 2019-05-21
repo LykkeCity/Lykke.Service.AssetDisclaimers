@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
-using Common;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Common.Log;
 using Lykke.Service.AssetDisclaimers.Core.Domain;
 using Lykke.Service.AssetDisclaimers.Core.Exceptions;
 using Lykke.Service.AssetDisclaimers.Core.Services;
 using Lykke.Service.AssetDisclaimers.Extensions;
 using Lykke.Service.AssetDisclaimers.Models.LykkeEntities;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Lykke.Service.AssetDisclaimers.Controllers
 {
@@ -24,10 +24,10 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
 
         public LykkeEntitiesController(
             ILykkeEntityService lykkeEntityService,
-            ILog log)
+            ILogFactory logFactory)
         {
             _lykkeEntityService = lykkeEntityService;
-            _log = log;
+            _log = logFactory.CreateLog(this);
         }
 
         /// <summary>
@@ -99,8 +99,7 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
             }
             catch (LykkeEntityAlreadyExistsException exception)
             {
-                await _log.WriteErrorAsync(nameof(LykkeEntitiesController), nameof(AddAsync),
-                    model.ToJson(), exception);
+                _log.Error(exception, context: model);
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
         }
@@ -132,8 +131,7 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
             }
             catch (LykkeEntityNotFoundException exception)
             {
-                await _log.WriteErrorAsync(nameof(LykkeEntitiesController), nameof(UpdateAsync),
-                    model.ToJson(), exception);
+                _log.Error(exception, context: model);
                 return NotFound(ErrorResponse.Create(exception.Message));
             }
 
@@ -146,7 +144,7 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
         /// <param name="lykkeEntityId">The Lykke entity id.</param>
         /// <returns>No content.</returns>
         /// <response code="204">Lykke entity successfully deleted.</response>
-        /// <response code="400">Can not delete Lykke entity if one or more disclimers exists.</response>
+        /// <response code="400">Can not delete Lykke entity if one or more disclaimers exists.</response>
         [HttpDelete]
         [Route("lykkeentities/{lykkeEntityId}")]
         [SwaggerOperation("LykkeEntitiesDelete")]
@@ -160,8 +158,7 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
             }
             catch (InvalidOperationException exception)
             {
-                await _log.WriteErrorAsync(nameof(LykkeEntitiesController), nameof(DeleteAsync),
-                    new {lykkeEntityId}.ToJson(), exception);
+                _log.Error(exception, context: new {lykkeEntityId});
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
