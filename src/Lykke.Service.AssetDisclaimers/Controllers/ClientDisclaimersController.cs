@@ -6,13 +6,14 @@ using AutoMapper;
 using Common;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Common.Log;
 using Lykke.Service.AssetDisclaimers.Core.Domain;
 using Lykke.Service.AssetDisclaimers.Core.Exceptions;
 using Lykke.Service.AssetDisclaimers.Core.Services;
 using Lykke.Service.AssetDisclaimers.Models.ClientDisclaimers;
 using Lykke.Service.AssetDisclaimers.Models.Disclaimers;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Lykke.Service.AssetDisclaimers.Controllers
 {
@@ -26,11 +27,11 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
         public ClientDisclaimersController(
             IClientDisclaimerService clientDisclaimerService,
             IDisclaimerService disclaimerService,
-            ILog log)
+            ILogFactory logFactory)
         {
             _clientDisclaimerService = clientDisclaimerService;
             _disclaimerService = disclaimerService;
-            _log = log;
+            _log = logFactory.CreateLog(this);
         }
         
         /// <summary>
@@ -93,7 +94,7 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
             if (disclaimers.Any())
             {
                 var disclaimersContext = disclaimers.Select(e => new { e.Id, e.Name, e.LykkeEntityId, e.StartDate, e.Type}).ToJson();
-                await _log.WriteInfoAsync(nameof(ClientDisclaimersController), nameof(GetPendingAsync), clientId, $"disclaimers list for client: {disclaimersContext}");
+                _log.Info($"disclaimers list for client: {disclaimersContext}", context: clientId);
             }
 
             var model = Mapper.Map<List<DisclaimerModel>>(disclaimers);
@@ -126,13 +127,7 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
             }
             catch (LykkeEntityNotFoundException exception)
             {
-                await _log.WriteErrorAsync(nameof(ClientDisclaimersController), nameof(CheckTradableAsync),
-                    new
-                    {
-                        clientId,
-                        lykkeEntityId1,
-                        lykkeEntityId2
-                    }.ToJson(), exception);
+                _log.Error(exception, context: new { clientId, lykkeEntityId1, lykkeEntityId2 });
                 return NotFound(ErrorResponse.Create(exception.Message));
             }
         }
@@ -161,12 +156,7 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
             }
             catch (LykkeEntityNotFoundException exception)
             {
-                await _log.WriteErrorAsync(nameof(ClientDisclaimersController), nameof(CheckDepositAsync),
-                    new
-                    {
-                        clientId,
-                        lykkeEntityId
-                    }.ToJson(), exception);
+                _log.Error(exception, context: new { clientId, lykkeEntityId });
                 return NotFound(ErrorResponse.Create(exception.Message));
             }
         }
@@ -195,18 +185,13 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
             }
             catch (LykkeEntityNotFoundException exception)
             {
-                await _log.WriteErrorAsync(nameof(ClientDisclaimersController), nameof(CheckWithdrawalAsync),
-                    new
-                    {
-                        clientId,
-                        lykkeEntityId
-                    }.ToJson(), exception);
+                _log.Error(exception, context: new { clientId, lykkeEntityId });
                 return NotFound(ErrorResponse.Create(exception.Message));
             }
         }
 
         /// <summary>
-        /// Sets client disclimer as approved. 
+        /// Sets client disclaimer as approved. 
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <param name="disclaimerId">The disclaimer id.</param>
@@ -226,12 +211,7 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
             }
             catch (DisclaimerNotFoundException exception)
             {
-                await _log.WriteWarningAsync(nameof(ClientDisclaimersController), nameof(ApproveAsync),
-                    new
-                    {
-                        clientId,
-                        disclaimerId
-                    }.ToJson(), exception);
+                _log.Warning(exception.Message, exception, new { clientId, disclaimerId });
                 return NotFound(ErrorResponse.Create(exception.Message));
             }
 
@@ -239,7 +219,7 @@ namespace Lykke.Service.AssetDisclaimers.Controllers
         }
         
         /// <summary>
-        /// Sets client disclimer as declined. 
+        /// Sets client disclaimer as declined. 
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <param name="disclaimerId">The disclaimer id.</param>
