@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Common;
 using Common.Log;
+using Lykke.Common.Log;
 using Lykke.Payments.FxPaygate.Client;
 using Lykke.Service.AssetDisclaimers.Core.Domain;
 using Lykke.Service.AssetDisclaimers.Core.Exceptions;
@@ -15,34 +15,31 @@ namespace Lykke.Service.AssetDisclaimers.Services
     public class ClientDisclaimerService : IClientDisclaimerService
     {
         private readonly IClientDisclaimerRepository _clientDisclaimerRepository;
-        private readonly ILykkeEntityRepository _lykkeEntityRepository;
-        private readonly IDisclaimerRepository _disclaimerRepository;
         private readonly TimeSpan _pendingTimeout;
         private readonly string _depositDelayDisclaimerId;
         private readonly IFxPaygateClient _fxPaygateClient;
+        private readonly RedisService _redisService;
         private readonly ILog _log;
 
         public ClientDisclaimerService(
             IClientDisclaimerRepository clientDisclaimerRepository,
-            ILykkeEntityRepository lykkeEntityRepository,
-            IDisclaimerRepository disclaimerRepository,
             IFxPaygateClient fxPaygateClient,
+            RedisService redisService,
             TimeSpan pendingTimeout,
             string depositDelayDisclaimerId,
-            ILog log)
+            ILogFactory logFactory)
         {
             _clientDisclaimerRepository = clientDisclaimerRepository;
-            _lykkeEntityRepository = lykkeEntityRepository;
-            _disclaimerRepository = disclaimerRepository;
             _pendingTimeout = pendingTimeout;
             _depositDelayDisclaimerId = depositDelayDisclaimerId;
             _fxPaygateClient = fxPaygateClient;
-            _log = log;
+            _redisService = redisService;
+            _log = logFactory.CreateLog(this);
         }
         
         public async Task<IReadOnlyList<IClientDisclaimer>> GetApprovedAsync(string clientId)
         {
-            IReadOnlyList<IClientDisclaimer> clientDisclaimers = await _clientDisclaimerRepository.GetAsync(clientId);
+            IReadOnlyList<IClientDisclaimer> clientDisclaimers = await _redisService.GetClientDisclaimersAsync(clientId);
 
             return clientDisclaimers
                 .Where(o => o.Approved)
@@ -51,7 +48,7 @@ namespace Lykke.Service.AssetDisclaimers.Services
         
         public async Task<IReadOnlyList<IClientDisclaimer>> GetPendingAsync(string clientId)
         {
-            IReadOnlyList<IClientDisclaimer> clientDisclaimers = await _clientDisclaimerRepository.GetAsync(clientId);
+            IReadOnlyList<IClientDisclaimer> clientDisclaimers = await _redisService.GetClientDisclaimersAsync(clientId);
 
             return clientDisclaimers
                 .Where(o => !o.Approved && o.ApprovedDate.Add(_pendingTimeout) > DateTime.UtcNow)
@@ -60,24 +57,24 @@ namespace Lykke.Service.AssetDisclaimers.Services
 
         public async Task<bool> CheckTradableAsync(string clientId, string lykkeEntityId1, string lykkeEntityId2)
         {
-            ILykkeEntity lykkeEntity1 = await _lykkeEntityRepository.GetAsync(lykkeEntityId1);
+            ILykkeEntity lykkeEntity1 = await _redisService.GetLykkeEntityAsync(lykkeEntityId1);
             
             if(lykkeEntity1 == null)
                 throw new LykkeEntityNotFoundException(lykkeEntityId1);
             
-            ILykkeEntity lykkeEntity2 = await _lykkeEntityRepository.GetAsync(lykkeEntityId2);
+            ILykkeEntity lykkeEntity2 = await _redisService.GetLykkeEntityAsync(lykkeEntityId2);
 
             if(lykkeEntity2 == null)
                 throw new LykkeEntityNotFoundException(lykkeEntityId2);
 
             ILykkeEntity lykkeEntity = lykkeEntity1.Priority > lykkeEntity2.Priority ? lykkeEntity1 : lykkeEntity2; 
-           
+            
             return await CheckDisclaimerAsync(clientId, lykkeEntity.Id, DisclaimerType.Tradable);
         }
 
         public async Task<bool> CheckDepositAsync(string clientId, string lykkeEntityId)
         {
-            ILykkeEntity lykkeEntity = await _lykkeEntityRepository.GetAsync(lykkeEntityId);
+            ILykkeEntity lykkeEntity = await _redisService.GetLykkeEntityAsync(lykkeEntityId); 
             
             if(lykkeEntity == null)
                 throw new LykkeEntityNotFoundException(lykkeEntityId);
@@ -93,7 +90,7 @@ namespace Lykke.Service.AssetDisclaimers.Services
         
         public async Task<bool> CheckWithdrawalAsync(string clientId, string lykkeEntityId)
         {
-            ILykkeEntity lykkeEntity = await _lykkeEntityRepository.GetAsync(lykkeEntityId);
+            ILykkeEntity lykkeEntity = await _redisService.GetLykkeEntityAsync(lykkeEntityId);
             
             if(lykkeEntity == null)
                 throw new LykkeEntityNotFoundException(lykkeEntityId);
@@ -103,44 +100,47 @@ namespace Lykke.Service.AssetDisclaimers.Services
 
         public async Task ApproveAsync(string clientId, string disclaimerId)
         {
-            IDisclaimer disclaimer = await _disclaimerRepository.FindAsync(disclaimerId);
+            IDisclaimer disclaimer = await _redisService.GetDisclaimerAsync(disclaimerId);
             
             if(disclaimer == null)
                 throw new DisclaimerNotFoundException(disclaimerId);
 
-            await _clientDisclaimerRepository.InsertOrReplaceAsync(new ClientDisclaimer
+            var clientDisclaimer = new ClientDisclaimer
             {
                 ClientId = clientId,
                 DisclaimerId = disclaimerId,
                 Approved = true,
                 ApprovedDate = DateTime.UtcNow
-            });
+            };
+
+            var tasks = new List<Task>
+            {
+                _clientDisclaimerRepository.InsertOrReplaceAsync(clientDisclaimer),
+                _redisService.AddClientDisclaimerAsync(clientDisclaimer)
+            };
+
+            await Task.WhenAll(tasks);
             
-            await _log.WriteInfoAsync(nameof(ClientDisclaimerService), nameof(ApproveAsync),
-                new
-                {
-                    clientId,
-                    disclaimerId
-                }.ToJson(), "Client disclaimer approved");
+            _log.Info("Client disclaimer approved", new { clientId, disclaimerId });
         }
 
         public async Task DeclineAsync(string clientId, string disclaimerId)
         {
-            await _clientDisclaimerRepository.DeleteAsync(clientId, disclaimerId);
+            var tasks = new List<Task>
+            {
+                _clientDisclaimerRepository.DeleteAsync(clientId, disclaimerId),
+                _redisService.DeleteClientDisclaimerAsync(clientId, disclaimerId)
+            };
+
+            await Task.WhenAll(tasks);
             
-            await _log.WriteInfoAsync(nameof(ClientDisclaimerService), nameof(DeclineAsync),
-                new
-                {
-                    clientId,
-                    disclaimerId
-                }.ToJson(), "Client disclaimer declined");
+            _log.Info("Client disclaimer declined", new { clientId, disclaimerId });
         }
 
         private async Task<bool> CheckDisclaimerAsync(string clientId, string lykkeEntityId, DisclaimerType type)
         {
-            IReadOnlyList<IDisclaimer> disclaimers = await _disclaimerRepository.GetAsync(lykkeEntityId);
-
-            IDisclaimer requiresApprovalDisclaimer = disclaimers
+            IDisclaimer requiresApprovalDisclaimer = (await _redisService.GetDisclaimersAsync())
+                .Where(x => x.LykkeEntityId == lykkeEntityId)
                 .Where(o => o.Type == type)
                 .Where(o => o.StartDate < DateTime.UtcNow)
                 .OrderByDescending(p => p.StartDate)
@@ -149,36 +149,53 @@ namespace Lykke.Service.AssetDisclaimers.Services
             if (requiresApprovalDisclaimer == null)
                 return false;
             
-            IReadOnlyList<IClientDisclaimer> clientDisclaimers = await _clientDisclaimerRepository.GetAsync(clientId);
+            IReadOnlyList<IClientDisclaimer> clientDisclaimers = await _redisService.GetClientDisclaimersAsync(clientId);
 
             HashSet<string> approvedDisclaimers = clientDisclaimers
                 .Where(o => o.Approved)
                 .Select(o => o.DisclaimerId)
                 .ToHashSet();
+
+            List<Task> tasks;
             
             if (approvedDisclaimers.Contains(requiresApprovalDisclaimer.Id))
             {
                 if (requiresApprovalDisclaimer.ShowOnEachAction)
                 {
-                    await _clientDisclaimerRepository.DeleteAsync(clientId, requiresApprovalDisclaimer.Id);
+                    tasks = new List<Task>
+                    {
+                        _clientDisclaimerRepository.DeleteAsync(clientId, requiresApprovalDisclaimer.Id),
+                        _redisService.DeleteClientDisclaimerAsync(clientId, requiresApprovalDisclaimer.Id)
+                    };
+
+                    await Task.WhenAll(tasks);
                 }
 
                 return false;
             }
-            
-            await _clientDisclaimerRepository.InsertOrReplaceAsync(new ClientDisclaimer
+
+            if (clientDisclaimers.Any(x => x.DisclaimerId == requiresApprovalDisclaimer.Id && !x.Approved))
+            {
+                _log.Info("Client pending disclaimer already added", new  { clientId, requiresApprovalDisclaimer.Id });
+                return true;
+            }
+
+            var clientDisclaimer = new ClientDisclaimer
             {
                 ClientId = clientId,
                 DisclaimerId = requiresApprovalDisclaimer.Id,
                 ApprovedDate = DateTime.UtcNow
-            });
-                
-            await _log.WriteInfoAsync(nameof(ClientDisclaimerService), nameof(CheckTradableAsync),
-                new
-                {
-                    clientId,
-                    requiresApprovalDisclaimer.Id
-                }.ToJson(), "Client pending disclaimer added");
+            };
+            
+            tasks = new List<Task>
+            {
+                _clientDisclaimerRepository.InsertOrReplaceAsync(clientDisclaimer),
+                _redisService.AddClientDisclaimerAsync(clientDisclaimer)
+            };
+
+            await Task.WhenAll(tasks);
+            
+            _log.Info("Client pending disclaimer added", new  { clientId, requiresApprovalDisclaimer.Id });
 
             return true;
         }
