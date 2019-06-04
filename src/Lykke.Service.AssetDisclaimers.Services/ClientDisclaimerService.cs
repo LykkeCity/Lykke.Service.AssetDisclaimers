@@ -36,7 +36,7 @@ namespace Lykke.Service.AssetDisclaimers.Services
             _redisService = redisService;
             _log = logFactory.CreateLog(this);
         }
-        
+
         public async Task<IReadOnlyList<IClientDisclaimer>> GetApprovedAsync(string clientId)
         {
             IReadOnlyList<IClientDisclaimer> clientDisclaimers = await _redisService.GetClientDisclaimersAsync(clientId);
@@ -45,7 +45,7 @@ namespace Lykke.Service.AssetDisclaimers.Services
                 .Where(o => o.Approved)
                 .ToList();
         }
-        
+
         public async Task<IReadOnlyList<IClientDisclaimer>> GetPendingAsync(string clientId)
         {
             IReadOnlyList<IClientDisclaimer> clientDisclaimers = await _redisService.GetClientDisclaimersAsync(clientId);
@@ -58,28 +58,28 @@ namespace Lykke.Service.AssetDisclaimers.Services
         public async Task<bool> CheckTradableAsync(string clientId, string lykkeEntityId1, string lykkeEntityId2)
         {
             ILykkeEntity lykkeEntity1 = await _redisService.GetLykkeEntityAsync(lykkeEntityId1);
-            
+
             if(lykkeEntity1 == null)
                 throw new LykkeEntityNotFoundException(lykkeEntityId1);
-            
+
             ILykkeEntity lykkeEntity2 = await _redisService.GetLykkeEntityAsync(lykkeEntityId2);
 
             if(lykkeEntity2 == null)
                 throw new LykkeEntityNotFoundException(lykkeEntityId2);
 
-            ILykkeEntity lykkeEntity = lykkeEntity1.Priority > lykkeEntity2.Priority ? lykkeEntity1 : lykkeEntity2; 
-            
+            ILykkeEntity lykkeEntity = lykkeEntity1.Priority > lykkeEntity2.Priority ? lykkeEntity1 : lykkeEntity2;
+
             return await CheckDisclaimerAsync(clientId, lykkeEntity.Id, DisclaimerType.Tradable);
         }
 
         public async Task<bool> CheckDepositAsync(string clientId, string lykkeEntityId)
         {
-            ILykkeEntity lykkeEntity = await _redisService.GetLykkeEntityAsync(lykkeEntityId); 
-            
+            ILykkeEntity lykkeEntity = await _redisService.GetLykkeEntityAsync(lykkeEntityId);
+
             if(lykkeEntity == null)
                 throw new LykkeEntityNotFoundException(lykkeEntityId);
 
-            if (!string.IsNullOrEmpty(_depositDelayDisclaimerId) && 
+            if (!string.IsNullOrEmpty(_depositDelayDisclaimerId) &&
                 !await _easyPaymentGatewayClient.Api.IsClientSuspicious(clientId))
             {
                 await ApproveAsync(clientId, _depositDelayDisclaimerId);
@@ -87,21 +87,21 @@ namespace Lykke.Service.AssetDisclaimers.Services
 
             return await CheckDisclaimerAsync(clientId, lykkeEntity.Id, DisclaimerType.Deposit);
         }
-        
+
         public async Task<bool> CheckWithdrawalAsync(string clientId, string lykkeEntityId)
         {
             ILykkeEntity lykkeEntity = await _redisService.GetLykkeEntityAsync(lykkeEntityId);
-            
+
             if(lykkeEntity == null)
                 throw new LykkeEntityNotFoundException(lykkeEntityId);
-           
+
             return await CheckDisclaimerAsync(clientId, lykkeEntity.Id, DisclaimerType.Withdrawal);
         }
 
         public async Task ApproveAsync(string clientId, string disclaimerId)
         {
             IDisclaimer disclaimer = await _redisService.GetDisclaimerAsync(disclaimerId);
-            
+
             if(disclaimer == null)
                 throw new DisclaimerNotFoundException(disclaimerId);
 
@@ -120,7 +120,7 @@ namespace Lykke.Service.AssetDisclaimers.Services
             };
 
             await Task.WhenAll(tasks);
-            
+
             _log.Info("Client disclaimer approved", new { clientId, disclaimerId });
         }
 
@@ -133,7 +133,7 @@ namespace Lykke.Service.AssetDisclaimers.Services
             };
 
             await Task.WhenAll(tasks);
-            
+
             _log.Info("Client disclaimer declined", new { clientId, disclaimerId });
         }
 
@@ -148,7 +148,7 @@ namespace Lykke.Service.AssetDisclaimers.Services
 
             if (requiresApprovalDisclaimer == null)
                 return false;
-            
+
             IReadOnlyList<IClientDisclaimer> clientDisclaimers = await _redisService.GetClientDisclaimersAsync(clientId);
 
             HashSet<string> approvedDisclaimers = clientDisclaimers
@@ -157,7 +157,7 @@ namespace Lykke.Service.AssetDisclaimers.Services
                 .ToHashSet();
 
             List<Task> tasks;
-            
+
             if (approvedDisclaimers.Contains(requiresApprovalDisclaimer.Id))
             {
                 if (requiresApprovalDisclaimer.ShowOnEachAction)
@@ -174,19 +174,13 @@ namespace Lykke.Service.AssetDisclaimers.Services
                 return false;
             }
 
-            if (clientDisclaimers.Any(x => x.DisclaimerId == requiresApprovalDisclaimer.Id && !x.Approved))
-            {
-                _log.Info("Client pending disclaimer already added", new  { clientId, requiresApprovalDisclaimer.Id });
-                return true;
-            }
-
             var clientDisclaimer = new ClientDisclaimer
             {
                 ClientId = clientId,
                 DisclaimerId = requiresApprovalDisclaimer.Id,
                 ApprovedDate = DateTime.UtcNow
             };
-            
+
             tasks = new List<Task>
             {
                 _clientDisclaimerRepository.InsertOrReplaceAsync(clientDisclaimer),
@@ -194,7 +188,7 @@ namespace Lykke.Service.AssetDisclaimers.Services
             };
 
             await Task.WhenAll(tasks);
-            
+
             _log.Info("Client pending disclaimer added", new  { clientId, requiresApprovalDisclaimer.Id });
 
             return true;
